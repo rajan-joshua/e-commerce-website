@@ -32,7 +32,7 @@ const Cart = () => {
               <img src={item.image} alt={item.name} className="cart-item-image" />
               <div>
                 <h3>{item.name}</h3>
-                <p>Price: ${item.price}</p>
+                <p>Price: ₹{item.price}</p>
                 <div className="quantity-controls">
                   <button onClick={() => decreaseQuantity(item.id)}>-</button>
                   <span>{item.quantity}</span>
@@ -44,7 +44,7 @@ const Cart = () => {
           ))}
         </div>
       )}
-      <h2>Total: ${totalPrice.toFixed(2)}</h2>
+      <h2>Total: ₹{totalPrice.toFixed(2)}</h2>
       {cart.length > 0 && <button className="checkout-btn" onClick={handleCheckout}>Proceed to Checkout</button>}
       {showMessage && <div className="floating-message">Redirecting to Checkout...</div>}
     </div>

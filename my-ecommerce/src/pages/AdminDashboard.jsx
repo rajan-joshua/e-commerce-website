@@ -1,121 +1,117 @@
-import { doc, getDoc, collection, addDoc, getDocs } from "firebase/firestore";
-import { useEffect, useState } from "react";
-import { db, auth } from "../firebaseConfig";
-import { onAuthStateChanged } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
-import "../styles/AdminDashboard.css";
+import React, { useState } from "react";
+import { db } from "../firebaseConfig";
+import { collection, addDoc } from "firebase/firestore";
+import "../styles/Admindashboard.css";
 
 const AdminDashboard = () => {
-  const [productName, setProductName] = useState("");
-  const [price, setPrice] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [description, setDescription] = useState("");
-  const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const navigate = useNavigate();
+  const [product, setProduct] = useState({
+    name: "",
+    price: "",
+    image: "",
+    description: "",
+    prediction: "",
+    sellers: "",
+    priceHistory: ""
+  });
 
-  useEffect(() => {
-    const checkAdmin = async (user) => {
-      if (!user) return;
-      const adminDocRef = doc(db, "admins", user.uid);
-      const adminDoc = await getDoc(adminDocRef);
-      setIsAdmin(adminDoc.exists());
-    };
-
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        navigate("/login");
-      } else {
-        checkAdmin(user);
-      }
-    });
-  }, [navigate]);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const querySnapshot = await getDocs(collection(db, "products"));
-      const productList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setProducts(productList);
-    };
-    
-    const fetchOrders = async () => {
-      const orderSnapshot = await getDocs(collection(db, "orders"));
-      const orderList = orderSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setOrders(orderList);
-    };
-    
-    fetchProducts();
-    fetchOrders();
-  }, []);
-
-  const handleAddProduct = async (e) => {
-    e.preventDefault();
-    if (!productName || !price || !imageUrl || !description) return;
-    
-    await addDoc(collection(db, "products"), {
-      name: productName,
-      price: parseFloat(price),
-      image: imageUrl,
-      description: description,
-    });
-    
-    alert("Product added successfully!");
-    setProductName("");
-    setPrice("");
-    setImageUrl("");
-    setDescription("");
+  const handleChange = (e) => {
+    setProduct({ ...product, [e.target.name]: e.target.value });
   };
 
-  if (!isAdmin) return <h2 className="access-denied">Access Denied</h2>;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const { name, price, image, description, prediction, sellers, priceHistory } = product;
+
+    // Basic check
+    if (!name || !price || !image || !description) {
+      alert("Please fill out required fields.");
+      return;
+    }
+
+    let sellersParsed = [];
+    let priceHistoryParsed = [];
+
+    try {
+      sellersParsed = JSON.parse(sellers);
+      if (!Array.isArray(sellersParsed)) throw new Error();
+    } catch {
+      alert("❌ Sellers must be a valid JSON array.");
+      return;
+    }
+
+    try {
+      priceHistoryParsed = JSON.parse(priceHistory);
+      if (!Array.isArray(priceHistoryParsed)) throw new Error();
+    } catch {
+      alert("❌ Price History must be a valid JSON array.");
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "products"), {
+        name,
+        price: parseFloat(price),
+        image,
+        description,
+        prediction: parseFloat(prediction) || 0,
+        sellers: sellersParsed,
+        priceHistory: priceHistoryParsed
+      });
+
+      alert("✅ Product added successfully!");
+      setProduct({
+        name: "",
+        price: "",
+        image: "",
+        description: "",
+        prediction: "",
+        sellers: "",
+        priceHistory: ""
+      });
+    } catch (err) {
+      console.error("Error adding product:", err);
+      alert("Error adding product.");
+    }
+  };
 
   return (
-    <div className="admin-container">
-      <h1 className="admin-title">Admin Dashboard</h1>
-      <form className="admin-form" onSubmit={handleAddProduct}>
-        <input type="text" placeholder="Product Name" value={productName} onChange={(e) => setProductName(e.target.value)} required />
-        <input type="number" placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} required />
-        <input type="text" placeholder="Image URL" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} required />
-        <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} required />
-        <button type="submit" className="add-product-button">Add Product</button>
+    <div className="admin-dashboard">
+      <h2>Add Product</h2>
+      <form onSubmit={handleSubmit}>
+        <label>Product Name*</label>
+        <input type="text" name="name" value={product.name} onChange={handleChange} required />
+
+        <label>Price*</label>
+        <input type="number" name="price" value={product.price} onChange={handleChange} required />
+
+        <label>Image URL*</label>
+        <input type="text" name="image" value={product.image} onChange={handleChange} required />
+
+        <label>Description*</label>
+        <textarea name="description" value={product.description} onChange={handleChange} required />
+
+        <label>Price Prediction (%)</label>
+        <input type="number" name="prediction" value={product.prediction} onChange={handleChange} />
+
+        <label>Sellers (JSON array)</label>
+        <textarea
+          name="sellers"
+          value={product.sellers}
+          onChange={handleChange}
+          placeholder='[{"name":"Amazon","price":25,"link":"https://..."}, ...]'
+        />
+
+        <label>Price History (JSON array)</label>
+        <textarea
+          name="priceHistory"
+          value={product.priceHistory}
+          onChange={handleChange}
+          placeholder='[{"date":"2025-01-01","price":29.99}, ...]'
+        />
+
+        <button type="submit">Add Product</button>
       </form>
-      <h2 className="product-list-title">Existing Products</h2>
-      <ul className="product-list">
-        {products.map(product => (
-          <li key={product.id} className="product-item">
-            <img src={product.image} alt={product.name} className="product-image" />
-            <div>
-              <h3>{product.name}</h3>
-              <p>${product.price}</p>
-              <p>{product.description}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
-      
-      <h2 className="order-list-title">Orders</h2>
-      <ul className="order-list">
-        {orders.length === 0 ? (
-          <p>No orders available.</p>
-        ) : (
-          orders.map((order) => (
-            <li key={order.id} className="order-item">
-              <h3>Order by: {order.name}</h3>
-              <p><strong>Phone:</strong> {order.phone}</p>
-              <p><strong>Address:</strong> {order.address}, {order.pincode}</p>
-              <p><strong>Total:</strong> ${order.total.toFixed(2)}</p>
-              <h4>Items:</h4>
-              <ul>
-                {order.items.map((item, index) => (
-                  <li key={index}>
-                    {item.name} - ${item.price} x {item.quantity}
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))
-        )}
-      </ul>
     </div>
   );
 };

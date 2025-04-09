@@ -109,9 +109,11 @@ const Home = () => {
             products.map(product => (
               <Link to={`/product/${product.id}`} key={product.id} className="product-card-link">
                 <div className="product-card">
-                  <img src={product.image} alt={product.name} />
+                  <div className="image-container">
+                    <img src={product.image} alt={product.name} />
+                  </div>
                   <h3>{product.name}</h3>
-                  <p>${product.price}</p>
+                  <p>₹{product.price}</p>
                   <button onClick={(e) => { e.preventDefault(); addToCart(product); }} className="add-to-cart">Add to Cart</button>
                 </div>
               </Link>

@@ -95,13 +95,13 @@ const Checkout = () => {
                 <img src={item.image} alt={item.name} className="checkout-item-image" />
                 <div>
                   <h3>{item.name}</h3>
-                  <p>Price: ${Number(item.price || 0).toFixed(2)}</p>
+                  <p>Price:₹{Number(item.price || 0).toFixed(2)}</p>
                   <p>Quantity: {item.quantity}</p>
                 </div>
               </div>
             ))}
           </div>
-          <h2>Total: ${totalPrice.toFixed(2)}</h2>
+          <h2>Total: ₹{totalPrice.toFixed(2)}</h2>
           <button className="pay-btn" onClick={handlePayment}>Pay Now</button>
         </>
       )}
