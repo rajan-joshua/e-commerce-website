@@ -185,3 +185,14 @@ body {
     justify-content: center;
   }
 }
+.delivery-estimate {
+  margin-top: 15px;
+  font-size: 1.1rem;
+  color: #22eaaa;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px 15px;
+  border-radius: 8px;
+  display: inline-block;
+  box-shadow: 0 0 10px rgba(0, 255, 170, 0.2);
+}

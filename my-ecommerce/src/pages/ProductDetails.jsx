@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase'; // update path if needed
+import { useCart } from '../context/CartContext'; // Make sure this path is correct
 import '../styles/ProductDetails.css';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -16,10 +17,12 @@ import {
 } from 'recharts';
 
 
+
 const ProductDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -53,6 +56,10 @@ const ProductDetails = () => {
           <h2>{product.name}</h2>
           <div className="product-price">₹{product.price}</div>
           <p>{product.description}</p>
+          
+<button className="add-to-cart" onClick={() => addToCart(product)}>
+  🛒 Add to Cart
+</button>
 
           {product.prediction && (
             <div className="prediction-meter">
@@ -64,6 +71,9 @@ const ProductDetails = () => {
             </div>
           )}
         </div>
+      </div>
+      <div className="delivery-estimate">
+  🚚    <strong>Estimated Delivery:</strong> 3–5 working days
       </div>
 
       {product.sellers && (
@@ -81,6 +91,7 @@ const ProductDetails = () => {
           </div>
         </div>
       )}
+      
 
 {product.priceHistory && product.priceHistory.length > 0 && (
   <div className="price-history" data-aos="fade-up">
@@ -95,6 +106,7 @@ const ProductDetails = () => {
       </LineChart>
     </ResponsiveContainer>
   </div>
+  
 )}
 
     </div>

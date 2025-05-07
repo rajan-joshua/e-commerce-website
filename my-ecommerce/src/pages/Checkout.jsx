@@ -13,12 +13,12 @@ const Checkout = () => {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [pincode, setPincode] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("cod");
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        // Fetch user details from Firestore
         const userDocRef = doc(db, "users", currentUser.uid);
         const userDoc = await getDoc(userDocRef);
         if (userDoc.exists()) {
@@ -42,11 +42,9 @@ const Checkout = () => {
     }
 
     try {
-      // Save user details to Firestore
       const userDocRef = doc(db, "users", user.uid);
       await setDoc(userDocRef, { name, phone, address, pincode }, { merge: true });
 
-      // Save order to Firestore
       await addDoc(collection(db, "orders"), {
         userId: user.uid,
         name,
@@ -54,13 +52,21 @@ const Checkout = () => {
         address,
         pincode,
         total: totalPrice,
+        paymentMethod,
         items: cart,
         timestamp: serverTimestamp(),
       });
 
       alert("Payment successful! Order placed.");
-      setCart([]); // Empty the cart after order placement
-      navigate("/");
+      setCart([]);
+      navigate("/order-success", {
+        state: {
+          userDetails: { name, phone, address, pincode },
+          items: cart,
+          total: totalPrice,
+          paymentMethod,
+        },
+      });
     } catch (error) {
       console.error("Error placing order: ", error);
       alert("Failed to place order. Please try again.");
@@ -89,20 +95,48 @@ const Checkout = () => {
             <input type="text" placeholder="Address" value={address} onChange={(e) => setAddress(e.target.value)} />
             <input type="text" placeholder="Pincode" value={pincode} onChange={(e) => setPincode(e.target.value)} />
           </div>
+
+          <div className="checkout-payment-options">
+            <h2>Select Payment Method</h2>
+            <label>
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="cod"
+                checked={paymentMethod === "cod"}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              />
+              Cash on Delivery
+            </label>
+            <label style={{ opacity: 0.6 }}>
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="online"
+                disabled
+              />
+              Online Payment (coming soon)
+            </label>
+            <div className="checkout-payment-note">
+              💡 Online payment will be added soon...
+            </div>
+          </div>
+
           <div className="checkout-items">
             {cart.map((item) => (
               <div key={item.id} className="checkout-item">
                 <img src={item.image} alt={item.name} className="checkout-item-image" />
                 <div>
                   <h3>{item.name}</h3>
-                  <p>Price:₹{Number(item.price || 0).toFixed(2)}</p>
+                  <p>Price: ₹{Number(item.price || 0).toFixed(2)}</p>
                   <p>Quantity: {item.quantity}</p>
                 </div>
               </div>
             ))}
           </div>
+
           <h2>Total: ₹{totalPrice.toFixed(2)}</h2>
-          <button className="pay-btn" onClick={handlePayment}>Pay Now</button>
+          <button className="pay-btn" onClick={handlePayment}>Place Order</button>
         </>
       )}
     </div>

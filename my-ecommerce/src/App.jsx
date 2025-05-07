@@ -5,12 +5,15 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { CartProvider } from "./context/CartContext"; // Import CartProvider
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Products from "./pages/Products";
 import Cart from "./pages/Cart"; // Ensure correct import
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProductDetails from "./pages/ProductDetails";
+import OrderSuccess from "./pages/order-success";
+import SearchResults from "./pages/SearchResults";
+
+
 
 
 // Authentication functions
@@ -34,13 +37,13 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/products" element={<Products />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/admindashboard" element={<AdminDashboard/>}/>   
           <Route path="/product/:id" element={<ProductDetails />} />       
-          
+          <Route path="/order-success" element={<OrderSuccess/>}/>
+          <Route path="/products" element={<SearchResults />} />
         </Routes>
       </Router>
     </CartProvider>

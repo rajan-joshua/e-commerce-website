@@ -6,7 +6,7 @@ import { useCart } from "../context/CartContext";
 import { auth } from "../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import "../styles/Home.css";
-import logo from "../assets/logo.png";
+import logo from "../assets/12.jpg";
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");

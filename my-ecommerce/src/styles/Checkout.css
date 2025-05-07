@@ -116,10 +116,82 @@ h2 {
   margin-top: 30px;
   box-shadow: 0 0 15px #44d66e88;
   transition: all 0.3s ease;
+  animation: pulse 2s infinite;
 }
 
 .pay-btn:hover,
 .login-btn:hover {
   background: linear-gradient(to right, #218838, #3bcf63);
   box-shadow: 0 0 25px #44d66ecc;
+}
+
+.checkout-payment-options {
+  width: 80%;
+  margin: 20px auto 30px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(6px);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+  text-align: left;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.checkout-payment-options h2 {
+  font-size: 1.6rem;
+  margin-bottom: 15px;
+  color: #ffeeaa;
+}
+
+.checkout-payment-options label {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  color: #ffffff;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.checkout-payment-options input[type="radio"] {
+  transform: scale(1.3);
+  accent-color: #44d66e;
+  transition: transform 0.3s;
+}
+
+.checkout-payment-options input[type="radio"]:hover {
+  transform: scale(1.5);
+}
+
+.checkout-payment-note {
+  font-size: 14px;
+  color: #eeeeee;
+  margin-top: 5px;
+  margin-left: 5px;
+  font-style: italic;
+  opacity: 0.8;
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 15px #44d66e88;
+  }
+  50% {
+    box-shadow: 0 0 25px #44d66ecc;
+  }
+  100% {
+    box-shadow: 0 0 15px #44d66e88;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
