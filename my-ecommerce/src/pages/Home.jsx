@@ -98,8 +98,8 @@ const Home = () => {
       </header>
 
       <section className="hero">
-        <h1>Welcome to My E-Commerce Store</h1>
-        <p>Find the best products at amazing prices!</p>
+        <h1>Welcome To The E_Commerce website  </h1>
+        <p>find the products below</p>
       </section>
 
       <section className="products-container">
